@@ -1,0 +1,6 @@
+module yang perlu di install
+
+pip install requests
+pip install SpeechRecognition
+pip install python-telegram-bot==13.5
+

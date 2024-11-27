@@ -1,0 +1,169 @@
+# import requests
+# import os  # Import modul os untuk mengatasi error "os is not defined"
+# from telegram import Update
+# from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackContext, ConversationHandler
+# from google.auth import credentials
+# from google.cloud import speech_v1p1beta1 as speech
+
+# # Ganti dengan token bot Telegram Anda
+# TELEGRAM_TOKEN = '6751900243:AAHP4XVpxSzjEge_GOBbfJFyuoU4u0SzjGQ'
+# # Ganti dengan token API Wit.ai Anda
+# WIT_AI_TOKEN = 'ONW4F5XP2UOUNYGV7Q35PWV4ULY5PZGX'
+
+# # Daftar state untuk ConversationHandler
+# VOICE_MESSAGE = 0
+
+# # Path to your Google Cloud credentials JSON file
+# GOOGLE_CLOUD_CREDENTIALS_FILE = 'D:/Bot Telegram/chatgpt-telegram-elevenlabs-voice-assistant-main/api-speech/keyfile.json'
+
+# # Fungsi untuk menangani pesan teks dari pengguna
+# def handle_text_message(update: Update, context: CallbackContext):
+#     message_text = update.message.text
+#     wit_url = f'https://api.wit.ai/message?v=20220101&q={message_text}'
+#     headers = {'Authorization': f'Bearer {WIT_AI_TOKEN}'}
+#     response = requests.get(wit_url, headers=headers)
+#     wit_data = response.json()
+
+#     # Print respons JSON ke terminal Visual Studio Code
+#     print(wit_data)
+
+
+#     # Lakukan sesuatu dengan hasil dari Wit.ai
+#     # Misalnya, dapatkan intent atau entity tertentu
+#     intent = wit_data['intents'][0]['name'] if wit_data['intents'] else None
+#     entities = wit_data['entities']
+
+#     # Tentukan respon bot berdasarkan hasil Wit.ai
+#     response_text = generate_response(intent, entities)
+
+#     # Kirim respon ke pengguna
+#     chat_id = update.message.chat_id
+#     context.bot.send_message(chat_id=chat_id, text=response_text)
+
+# # Fungsi untuk menangani pesan dari pengguna
+# def generate_response(intent, entities):
+#     # Logika untuk menghasilkan respon berdasarkan intent dan entities dari Wit.ai
+#     # Gantilah dengan logika khusus Anda
+#     if intent == 'list':
+#         return "Berikut list Informasi : KKN, Magang, Pengajuan UKT"
+#     elif intent == 'magang':
+#         return "Magang reguler dan magang MSIB"
+#     elif intent == 'kkn':
+#         return "Program KKN tersedia di beberapa jurusan, seperti..."
+#     elif intent == 'pengajuan_ukt':
+#         return "Silakan kunjungi halaman pengajuan UKT di situs web kami untuk informasi lebih lanjut."
+#     elif intent == 'jadwal':
+#         if 'matkul' in entities:
+#             matkul = entities['matkul'][0]['value']
+#             return f"Jadwal untuk mata kuliah {matkul} adalah..."
+#         else:
+#             return "Mohon berikan nama mata kuliah untuk mendapatkan jadwalnya."
+#     else:
+#         return "Maaf, saya tidak mengerti permintaan Anda."
+
+
+# def convert_audio_to_text(audio_file):
+#     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GOOGLE_CLOUD_CREDENTIALS_FILE
+    
+#     client = speech.SpeechClient()
+#     with open(audio_file, "rb") as audio_file:
+#         content = audio_file.read()
+
+#     audio = speech.RecognitionAudio(content=content)
+#     config = speech.RecognitionConfig(
+#         encoding=speech.RecognitionConfig.AudioEncoding.OGG_OPUS,
+#         sample_rate_hertz=16000,
+#         language_code="id-ID",  # Ubah kode bahasa ke "id-ID" untuk bahasa Indonesia
+#     )
+
+#     response = client.recognize(config=config, audio=audio)
+
+#     for result in response.results:
+#         return result.alternatives[0].transcript
+
+# # Fungsi untuk menangani pesan suara dari pengguna
+# def handle_voice_message(update: Update, context: CallbackContext):
+#     voice_file = update.message.voice.get_file()
+#     voice_file.download('voice_message.ogg')  # Simpan file suara
+#     audio_text = convert_audio_to_text('voice_message.ogg')
+
+#     # Kirim teks hasil pengonversian suara ke Wit.ai
+#     wit_url = f'https://api.wit.ai/message?v=20220101&q={audio_text}'
+#     headers = {'Authorization': f'Bearer {WIT_AI_TOKEN}'}
+#     response = requests.get(wit_url, headers=headers)
+#     wit_data = response.json()
+
+#     print(wit_data)
+    
+#     # Lakukan sesuatu dengan hasil dari Wit.ai
+#     # Misalnya, dapatkan intent atau entity tertentu
+#     intent = wit_data['intents'][0]['name'] if wit_data['intents'] else None
+#     entities = wit_data['entities']
+
+#     # Tentukan respon bot berdasarkan hasil Wit.ai
+#     response_text = generate_response(intent, entities)
+
+#     # Kirim respon ke pengguna
+#     chat_id = update.message.chat_id
+#     context.bot.send_message(chat_id=chat_id, text=response_text)
+
+# # Tambahkan fungsi convert_audio_to_text ke dalam main()
+# def main():
+#     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
+#     dp = updater.dispatcher
+
+#     # Menangani pesan teks dari pengguna
+#     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_text_message))
+#     # Menangani pesan suara dari pengguna
+#     dp.add_handler(MessageHandler(Filters.voice, handle_voice_message))
+
+#     # Jalankan bot
+#     updater.start_polling()
+#     updater.idle()
+
+# if __name__ == '__main__':
+#     main()
+
+# # Fungsi untuk menangani pesan suara dari pengguna
+# def handle_voice_message(update: Update, context: CallbackContext):
+#     voice_file = update.message.voice.get_file()
+#     voice_file.download('voice_message.ogg')  # Simpan file suara
+#     wit_url = 'https://api.wit.ai/speech?v=20220101'
+#     headers = {'Authorization': f'Bearer {WIT_AI_TOKEN}', 'Content-Type': 'audio/ogg'}
+#     voice_data = {'file': open('voice_message.ogg', 'rb')}
+#     response = requests.post(wit_url, headers=headers, files=voice_data)
+#     wit_data = response.json()
+    
+#     # Print respons JSON ke terminal Visual Studio Code
+#     print(response)
+#     print(wit_data)
+
+
+#     # Lakukan sesuatu dengan hasil dari Wit.ai
+#     # Misalnya, dapatkan intent atau entity tertentu
+#     intent = wit_data['intents'][0]['name'] if wit_data['intents'] else None
+#     entities = wit_data['entities']
+
+#     # Tentukan respon bot berdasarkan hasil Wit.ai
+#     response_text = generate_response(intent, entities)
+
+#     # Kirim respon ke pengguna
+#     chat_id = update.message.chat_id
+#     context.bot.send_message(chat_id=chat_id, text=response_text)
+
+# # Fungsi untuk mengatur ConversationHandler
+# def main():
+#     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
+#     dp = updater.dispatcher
+
+#     # Menangani pesan teks dari pengguna
+#     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_text_message))
+#     # Menangani pesan suara dari pengguna
+#     dp.add_handler(MessageHandler(Filters.voice, handle_voice_message))
+
+#     # Jalankan bot
+#     updater.start_polling()
+#     updater.idle()
+
+# if __name__ == '__main__':
+#     main()
